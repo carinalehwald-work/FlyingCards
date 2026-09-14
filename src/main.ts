@@ -34,9 +34,35 @@ const flashcards = [
   },
 ];
 
+const startCard = {
+  title: "JavaScript Grundlagen",
+  description: "Dein Lernkartenstapel",
+};
+
+const showStartCard = true;
+
 let currentIndex = 0;
 let isAnimating = false;
 let isFinished = false;
+let isStartCardVisible = showStartCard;
+
+function createStartCard(animateInitialStack: boolean) {
+  const card = document.createElement("article");
+
+  card.classList.add("card", "card--start", "card--current");
+
+  if (animateInitialStack) {
+    card.classList.add("card--initial", "card--initial-front");
+  }
+
+  card.innerHTML = `
+    <h2>${startCard.title}</h2>
+    <p>${startCard.description}</p>
+    <span>${flashcards.length} Karten</span>
+  `;
+
+  return card;
+}
 
 function showCurrentCard(animateNewCard = false, animateInitialStack = false) {
   cardStackElement.innerHTML = "";
@@ -45,13 +71,46 @@ function showCurrentCard(animateNewCard = false, animateInitialStack = false) {
     return;
   }
 
-  if (flashcards.length === 0) {
-    const emptyMessage = document.createElement("p");
+  if (showStartCard && isStartCardVisible) {
+    cardStackElement.appendChild(createStartCard(animateInitialStack));
 
-    emptyMessage.classList.add("empty-message");
-    emptyMessage.textContent = "Hier ist noch nichts angelegt. Lege Karten an.";
+    const firstCard = flashcards[currentIndex];
 
-    cardStackElement.appendChild(emptyMessage);
+    if (firstCard) {
+      const card = document.createElement("article");
+
+      card.classList.add("card", "card--next");
+
+      if (animateInitialStack) {
+        card.classList.add(
+          "card--initial",
+          "card--initial-middle",
+          "card--initial-hidden",
+        );
+      }
+
+      card.textContent = firstCard.question;
+      cardStackElement.appendChild(card);
+    }
+
+    const secondCard = flashcards[currentIndex + 1];
+
+    if (secondCard) {
+      const card = document.createElement("article");
+
+      card.classList.add("card", "card--next-next");
+
+      if (animateInitialStack) {
+        card.classList.add(
+          "card--initial",
+          "card--initial-back",
+          "card--initial-hidden",
+        );
+      }
+
+      card.textContent = secondCard.question;
+      cardStackElement.appendChild(card);
+    }
 
     return;
   }
@@ -69,7 +128,7 @@ function showCurrentCard(animateNewCard = false, animateInitialStack = false) {
     const card = document.createElement("article");
 
     card.classList.add("card");
-    
+
     card.textContent = flashcard.question;
 
     if (offset === 0) {
@@ -141,6 +200,26 @@ function showNextCard() {
 
   isAnimating = true;
 
+  if (isStartCardVisible) {
+    const startCard = cardStackElement.querySelector(".card--start");
+    const nextCard = cardStackElement.querySelector(".card--next");
+    const nextNextCard = cardStackElement.querySelector(".card--next-next");
+
+    startCard?.classList.add("card--leaving");
+    nextCard?.classList.add("card--moving-forward");
+    nextNextCard?.classList.add("card--moving-forward-next");
+
+    isStartCardVisible = false;
+
+    setTimeout(() => {
+      currentIndex = 0;
+      showCurrentCard();
+      isAnimating = false;
+    }, 400);
+
+    return;
+  }
+
   const currentCard = cardStackElement.querySelector(".card--current");
   const nextCard = cardStackElement.querySelector(".card--next");
   const nextNextCard = cardStackElement.querySelector(".card--next-next");
@@ -168,6 +247,9 @@ function showNextCard() {
   }, 400);
 }
 function showPreviousCard() {
+  if (isStartCardVisible) {
+    return;
+  }
   currentIndex = currentIndex - 1;
   if (currentIndex < 0) {
     currentIndex = flashcards.length - 1;
@@ -188,6 +270,7 @@ function restartCards() {
   currentIndex = 0;
   isFinished = false;
   isAnimating = true;
+  isStartCardVisible = showStartCard;
 
   restartButton?.classList.remove("restart-button--visible");
 
