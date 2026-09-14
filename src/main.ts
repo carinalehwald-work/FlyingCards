@@ -1,58 +1,172 @@
 const cardStack = document.querySelector(".card-stack");
+const restartButton = document.querySelector(".restart-button");
+
+if (!cardStack) {
+  throw new Error("Card stack wurde nicht gefunden.");
+}
+
+const cardStackElement = cardStack;
 
 const flashcards = [
   {
-    question: "Was ist TypeScript?",
-    answer:
-      "Eine Programmiersprache, die JavaScript um statische Typen erweitert.",
+    question: "Karte 1",
+    answer: "Antwort 1",
   },
   {
-    question: "Was ist HTML?",
-    answer: "Eine Auszeichnungssprache zur Strukturierung von Webseiten.",
+    question: "Karte 2",
+    answer: "Antwort 2",
   },
   {
-    question: "Was ist CSS?",
-    answer: "Eine Stylesheet-Sprache zur Gestaltung von Webseiten.",
+    question: "Karte 3",
+    answer: "Antwort 3",
+  },
+  {
+    question: "Karte 4",
+    answer: "Antwort 4",
+  },
+  {
+    question: "Karte 5",
+    answer: "Antwort 5",
+  },
+  {
+    question: "Karte 6",
+    answer: "Antwort 6",
   },
 ];
 
 let currentIndex = 0;
+let isAnimating = false;
+let isFinished = false;
 
-function showCurrentCard() {
-  if (cardStack) {
-    cardStack.innerHTML = "";
+function showCurrentCard(animateNewCard = false, animateInitialStack = false) {
+  cardStackElement.innerHTML = "";
 
-    flashcards.forEach((flashcard, index) => {
-      const card = document.createElement("article");
+  if (isFinished) {
+    return;
+  }
 
-      card.classList.add("card");
+  if (flashcards.length === 0) {
+    const emptyMessage = document.createElement("p");
 
-      card.textContent = flashcard.question;
+    emptyMessage.classList.add("empty-message");
+    emptyMessage.textContent = "Hier ist noch nichts angelegt. Lege Karten an.";
 
-      if (index === currentIndex) {
-        card.classList.add("card--current");
-      } else if (index === (currentIndex + 1) % flashcards.length) {
-        card.classList.add("card--next");
-      } else {
-        card.classList.add("card--next-next");
+    cardStackElement.appendChild(emptyMessage);
+
+    return;
+  }
+
+  const visibleCards = Math.min(3, flashcards.length - currentIndex);
+
+  for (let offset = 0; offset < visibleCards; offset++) {
+    const index = currentIndex + offset;
+    const flashcard = flashcards[index];
+
+    if (!flashcard) {
+      continue;
+    }
+
+    const card = document.createElement("article");
+
+    card.classList.add("card");
+    
+    card.textContent = flashcard.question;
+
+    if (offset === 0) {
+      card.classList.add("card--current");
+
+      if (animateInitialStack) {
+        card.classList.add("card--initial", "card--initial-front");
+      }
+    } else if (offset === 1) {
+      card.classList.add("card--next");
+
+      if (animateInitialStack) {
+        card.classList.add(
+          "card--initial",
+          "card--initial-middle",
+          "card--initial-hidden",
+        );
+      }
+    } else {
+      card.classList.add("card--next-next");
+
+      if (animateNewCard) {
+        card.classList.add("card--appearing");
       }
 
-      cardStack.appendChild(card);
-    });
+      if (animateInitialStack) {
+        card.classList.add(
+          "card--initial",
+          "card--initial-back",
+          "card--initial-hidden",
+        );
+      }
+    }
+
+    cardStackElement.appendChild(card);
   }
 }
 
-showCurrentCard();
+function showRestartButton() {
+  restartButton?.classList.add("restart-button--visible");
+}
+
+function finishInitialAnimation() {
+  const initialCards = cardStackElement.querySelectorAll(".card--initial");
+
+  initialCards.forEach((card) => {
+    card.classList.remove(
+      "card--initial",
+      "card--initial-front",
+      "card--initial-middle",
+      "card--initial-back",
+    );
+  });
+}
+
+isAnimating = true;
+
+showCurrentCard(false, true);
+
+setTimeout(() => {
+  finishInitialAnimation();
+  isAnimating = false;
+}, 1150);
 
 function showNextCard() {
-  currentIndex = currentIndex + 1;
-  
-  if (currentIndex >= flashcards.length) {
-    currentIndex = 0;
+  if (isAnimating || isFinished) {
+    return;
   }
-  showCurrentCard();
-}
 
+  isAnimating = true;
+
+  const currentCard = cardStackElement.querySelector(".card--current");
+  const nextCard = cardStackElement.querySelector(".card--next");
+  const nextNextCard = cardStackElement.querySelector(".card--next-next");
+
+  currentCard?.classList.add("card--leaving");
+  nextCard?.classList.add("card--moving-forward");
+  nextNextCard?.classList.add("card--moving-forward-next");
+
+  setTimeout(() => {
+    if (currentIndex === flashcards.length - 1) {
+      isFinished = true;
+
+      cardStackElement.innerHTML = "";
+
+      showRestartButton();
+
+      isAnimating = false;
+      return;
+    }
+
+    currentIndex = currentIndex + 1;
+
+    showCurrentCard(true);
+    isAnimating = false;
+  }, 400);
+}
 function showPreviousCard() {
   currentIndex = currentIndex - 1;
   if (currentIndex < 0) {
@@ -68,4 +182,23 @@ cardStack?.addEventListener("click", () => {
 cardStack?.addEventListener("contextmenu", (event) => {
   event.preventDefault();
   showPreviousCard();
+});
+
+function restartCards() {
+  currentIndex = 0;
+  isFinished = false;
+  isAnimating = true;
+
+  restartButton?.classList.remove("restart-button--visible");
+
+  showCurrentCard(false, true);
+
+  setTimeout(() => {
+    finishInitialAnimation();
+    isAnimating = false;
+  }, 1150);
+}
+
+restartButton?.addEventListener("click", () => {
+  restartCards();
 });

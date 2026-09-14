@@ -45,6 +45,8 @@ header {
   inset: 0;
 
   user-select: none;
+
+  transition: transform 0.4s ease;
 }
 
 .card--current {
@@ -52,12 +54,104 @@ header {
   z-index: 3;
 }
 
+.card--current.card--leaving {
+  z-index: 4;
+  animation: card-leaving 0.4s ease-out forwards;
+}
+
+@keyframes card-leaving {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+
+  85% {
+    transform: translate(135%, 2.5rem) rotate(12deg) scale(0.84);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translate(160%, 3rem) rotate(14deg) scale(0.8);
+    opacity: 0;
+  }
+}
+
 .card--next {
-  transform: translate(0.5rem, -0.5rem);
+  transform: translate(0.5rem, -0.5rem) scale(0.98);
   z-index: 2;
 }
 
 .card--next-next {
-  transform: translate(1rem, -1rem);
+  transform: translate(1rem, -1rem) scale(0.96);
   z-index: 1;
+}
+
+.card--appearing {
+  animation: card-appear 0.4s ease;
+}
+
+@keyframes card-appear {
+  from {
+    transform: translate(1.5rem, -1.5rem) scale(0.9);
+  }
+
+  to {
+    transform: translate(1rem, -1rem) scale(0.96);
+  }
+}
+
+.card--initial {
+  animation: card-initial 0.45s ease both;
+}
+
+.card--initial-back {
+  animation-delay: 0s;
+}
+
+.card--initial-middle {
+  animation-delay: 0.35s;
+}
+
+.card--initial-front {
+  animation-delay: 0.7s;
+}
+
+.card--initial-hidden {
+  color: transparent;
+}
+
+@keyframes card-initial {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.card--moving-forward {
+  transform: translate(0, 0) scale(1);
+  z-index: 3;
+}
+
+.card--moving-forward-next {
+  transform: translate(0.5rem, -0.5rem) scale(0.98);
+  z-index: 2;
+}
+
+.restart-button {
+  display: none;
+  position: absolute;
+  width: min(90%, 24rem);
+}
+
+.restart-button--visible {
+  display: block;
+}
+
+.empty-message {
+  text-align: center;
+  margin: 0;
 }
