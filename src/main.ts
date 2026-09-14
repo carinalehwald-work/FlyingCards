@@ -1,10 +1,10 @@
-const card = document.querySelector(".card");
+const cardStack = document.querySelector(".card-stack");
 
 const flashcards = [
   {
     question: "Was ist TypeScript?",
     answer:
-      "Ein Programmiersprache, die JavaScript um statische Typen erweitert.",
+      "Eine Programmiersprache, die JavaScript um statische Typen erweitert.",
   },
   {
     question: "Was ist HTML?",
@@ -19,8 +19,26 @@ const flashcards = [
 let currentIndex = 0;
 
 function showCurrentCard() {
-  if (card) {
-    card.textContent = flashcards[currentIndex]?.question ?? "";
+  if (cardStack) {
+    cardStack.innerHTML = "";
+
+    flashcards.forEach((flashcard, index) => {
+      const card = document.createElement("article");
+
+      card.classList.add("card");
+
+      card.textContent = flashcard.question;
+
+      if (index === currentIndex) {
+        card.classList.add("card--current");
+      } else if (index === (currentIndex + 1) % flashcards.length) {
+        card.classList.add("card--next");
+      } else {
+        card.classList.add("card--next-next");
+      }
+
+      cardStack.appendChild(card);
+    });
   }
 }
 
@@ -28,7 +46,7 @@ showCurrentCard();
 
 function showNextCard() {
   currentIndex = currentIndex + 1;
-
+  
   if (currentIndex >= flashcards.length) {
     currentIndex = 0;
   }
@@ -43,9 +61,11 @@ function showPreviousCard() {
   showCurrentCard();
 }
 
-card?.addEventListener("click", showNextCard);
+cardStack?.addEventListener("click", () => {
+  showNextCard();
+});
 
-card?.addEventListener("contextmenu", (event) => {
+cardStack?.addEventListener("contextmenu", (event) => {
   event.preventDefault();
   showPreviousCard();
 });

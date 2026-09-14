@@ -19,10 +19,17 @@ header {
   justify-content: center;
   align-items: center;
   padding: 1rem;
+  position: relative;
+}
+
+.card-stack {
+  position: relative;
+  width: min(90%, 24rem);
+  min-height: 20rem;
 }
 
 .card {
-  width: min(90%, 24rem);
+  width: 100%;
   min-height: 20rem;
   padding: 2rem;
 
@@ -33,4 +40,24 @@ header {
   background: #FFFFF0;
   border: 1px solid #ddd;
   border-radius: 0.5rem;
+
+  position: absolute;
+  inset: 0;
+
+  user-select: none;
+}
+
+.card--current {
+  transform: translate(0, 0);
+  z-index: 3;
+}
+
+.card--next {
+  transform: translate(0.5rem, -0.5rem);
+  z-index: 2;
+}
+
+.card--next-next {
+  transform: translate(1rem, -1rem);
+  z-index: 1;
 }
