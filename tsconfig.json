@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    "module": "nodenext",
+    "target": "es2022",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+
+    "sourceMap": true,
+
+    "moduleDetection": "force",
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+
+    "skipLibCheck": true
+  },
+  "include": ["src"]
+}
