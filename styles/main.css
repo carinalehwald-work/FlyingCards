@@ -1,0 +1,36 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #faf9f6;
+}
+
+header {
+  padding: 1rem;
+  text-align: center;
+}
+
+.learning-area {
+  min-height: 70vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+.card {
+  width: min(90%, 24rem);
+  min-height: 20rem;
+  padding: 2rem;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background: #FFFFF0;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+}
